@@ -1,0 +1,260 @@
+Mihut Maria-Emilia 311CA
+
+Task 1 - remove numbers
+
+Initializarea indexului: Am resetat registrul ecx la 0, care a fost folosit
+pentru a urmari numarul de elemente valide in array-ul target.
+
+Bucla de procesare: Am folosit un loop/for pentru a parcurge fiecare element al
+array-ului de intrare. Registrul esi contine adresa array-ului de intrare, iar
+ebx pastreaza numarul de elemente ramase de procesat.
+
+Verificarea numerelor impare: Pentru fiecare element, am folosit "test eax, 1"
+pentru a verifica daca cel mai putin semnificativ bit (LSB) este 1, ceea ce indica
+un numar impar. Daca numarul era impar, am sarit la urmatorul element folosind jnz next.
+
+Verificarea puterilor de 2: Daca numarul era par, am scazut 1 din valoarea sa
+cu sub eax, 1, apoi am verificat daca rezultatul este 0 folosind "and eax, [esi]",
+ceea ce arata ca numarul este o putere a 2 (deoarece puterile de 2 au un singur bit
+set). Daca era o putere a 2, am sarit la urmatorul numar cu jz next.
+
+Stocarea numerelor valide: Daca numarul nu era nici impar, nici putere a 2, l-am
+copiat in array-ul target folosind "mov [edi + ecx * 4], eax", iar apoi am
+incrementat ecx pentru a avansa la urmatoarea pozitie din array-ul de destinatie.
+
+Finalizarea procesarii: Dupa ce am parcurs toate elementele, am scris in memoria
+indicata de edx numarul de elemente valide (valoarea din ecx) folosind
+"mov [edx], ecx".
+
+Astfel, functia a procesat array-ul de intrare, a eliminat numerele impare si pe cele
+care sunt puteri ale lui 2, iar la final a returnat numarul de elemente valide in
+ptr_len.
+
+Task 2 - events
+
+In subtaskul 1 al Taskului 2, am implementat verificarea validitatii
+datelor fiecarui eveniment in functie de regulile specificate.
+
+Iterarea prin evenimente:
+
+Am inceput bucla de procesare a fiecărui eveniment, accesand datele fiecărui event folosind 
+registrul ebx. Pentru fiecare eveniment, am resetat campul valid la 0, presupunand ca este
+invalid pana la verificarile ulterioare.
+
+Verificarea anului: Am folosit cmp pentru a verifica daca anul este intre
+1990 si 2030. Daca era mai mic decat 1990 sau mai mare decat 2030, treceam la
+urmatorul eveniment.
+
+Verificarea lunii: Am folosit cmp pentru a verifica daca luna este intre
+1 si 12. Daca era invalida, treceam la urmatorul eveniment.
+
+Verificarea zilei: Am accesat ziua si luna din structura evenimentului, iar
+cu movzx am extins valoarea lunii pentru a accesa corect numarul de zile din
+luna respectiva din array-ul days. Am verificat daca ziua era intre 1 si numarul
+de zile valid din luna respectiva. Daca era invalida, treceam la urmatorul eveniment.
+
+Setarea validitatii: Daca anul, luna si ziua erau valide, am setat valid = 1.
+
+Trecerea la urmatorul eveniment: Dupa fiecare eveniment procesat, am
+folosit add ebx, event_size pentru a muta pointer-ul la urmatorul eveniment si
+am folosit loop pentru a repeta procesul pentru toate evenimentele.
+
+In subtaskul 2, am implementat un algoritm de bubble sort pentru a sorta evenimentele conform mai 
+multor criterii.
+
+Stim:
+- ebx: pointerul catre array-ul de evenimente.
+- ecx: lungimea array-ului (n).
+
+Dupa aceasta, am decrementat ecx cu 1 pentru a ajusta numarul de iteratii necesar pentru algoritmul 
+bubble sort, care parcurge elementele de la 0 la n-1.
+
+Buclele de comparare
+
+Am folosit doua bucle:
+Buclea externa (do_loop) pentru a repeta sortarea pana cand nu mai sunt necesare schimburi.
+Buclea interna (for_loop) pentru a compara perechile de evenimente adiacente si a le schimba intre 
+ele daca ordinea nu este corecta.
+
+La inceputul fiecarei iteratii a buclei externe, am setat flag-ul dl la 0 pentru a semnala ca nu au 
+fost facute schimburi, iar edi este utilizat pentru a urmari indexul curent al evenimentului.
+
+Comparatia campului valid
+Am comparat campul valid al fiecarui eveniment adiacente. Evenimentele valide sunt plasate mai 
+devreme, astfel, daca evenimentul curent este invalid si urmatorul este valid, le-am schimbat intre 
+ele. Daca valid[i] era mai mic decat valid[i+1], am facut swap.
+
+Comparatia anului
+Daca validitatea era aceeasi, am comparat anii evenimentelor. Evenimentul cu anul mai mic trebuia 
+plasat mai devreme. Daca year[i] era mai mic decat year[i+1], am facut swap intre evenimente.
+
+Comparatia lunii si zilei
+Daca anul era acelasi, am comparat lunile. Daca lunile erau si ele egale, am comparat zilele. Daca 
+month[i] era mai mic decat month[i+1] sau day[i] mai mic decat day[i+1], am facut swap.
+
+Comparatia numelui
+Daca toate celelalte campuri erau egale, am comparat numele evenimentelor byte cu byte. Daca name[i] 
+era mai mic decat name[i+1], am facut swap
+
+Schimbarea campurilor
+Dupa fiecare comparatie, daca ordinea nu era corecta, am schimbat campurile relevante intre cele doua 
+evenimente: valid, day, month, year si name. Am folosit instructiuni mov pentru a schimba valorile 
+campurilor. Schimbarea campurilor de tip text (numele) a necesitat un schimb bit cu bit pe 31 de 
+caractere.
+
+Repetarea procesului
+Dupa fiecare schimb, am setat dl la 1 pentru a semnala ca a avut loc un swap si am continuat bucla 
+interna pentru a compara urmatoarea pereche de evenimente.
+
+Daca nu s-au mai facut schimburi intr-o iteratie intre toate perechile, bucla externa s-a oprit, semn 
+ca array-ul a fost complet sortat.
+
+Pt bubble sort am folosit algoritmul urmator
+
+void bubble_sort(event *events, int len) {
+int swapped; // dl in cazul meu
+
+do {
+swapped = 0;
+for (int i = 0; i < len - 1; i++) {
+if (events[i].valid < events[i + 1].valid) {
+---
+} else if (events[i].valid == events[i + 1].valid) {
+---
+} else if (events[i].date.year == events[i + 1].date.year) {
+---
+} else if (events[i].date.month == events[i + 1].date.month) {
+    ---
+    } else if (events[i].date.day == events[i + 1].date.day) {
+        ---
+        }
+    }
+}
+}
+}
+}
+} while (swapped);  // Continue until no swaps happen
+
+Task 3 - base64
+
+Algoritmul transforma un string de intrare in format Base64, folosind grupuri de 3 bytes care sunt 
+convertite in 4 caractere Base64.
+
+Initializarea registrilor
+- ebx pentru lungimea string-ului de intrare (n),
+- esi pentru pointerul catre string-ul de intrare,
+- edi pentru pointerul catre string-ul de iesire,
+- iar edx pentru a stoca adresa la care va fi plasata lungimea rezultatului.
+
+Am setat eax si ecx la 0, pentru a folosi eax ca un counter pentru a calcula lungimea rezultatului,
+iar ecx este folosit pentru a parcurge fiecare byte din input.
+
+Gruparea si combinarea celor 3 bytes
+Algoritmul lucreaza pe grupuri de 3 bytes. Fiecare grup de 3 bytes (24 biți) este combinat intr-o
+valoare de 24 de biți care este stocata in eax. Procesul consta in:
+
+- Incarcarea fiecarui byte in registrul al (8 biți).
+- Shifting: Fiecare byte este plasat in pozitia corespunzatoare, la stanga (prin shifturi de 8 biți).
+
+Astfel, in eax sunt combinate cele 3 bytes, care formeaza un numar de 24 de biți.
+
+Extrage 6 biți din 24 de biți
+
+Am utilizat shifting si masking pentru a extrage fiecare grup de 6 biți:
+
+- Primii 6 biți: Am folosit shr ebx, 18 pentru a extrage primii 6 biți.
+- Următorii 6 biți: Am folosit shr ebx, 12.
+- Următorii 6 biți: Am folosit shr ebx, 6.
+- Ultimii 6 biți: Direct extrasi folosind and ebx, 0x3F.
+
+Fiecare dintre aceste grupuri de 6 biți este apoi folosit pentru a cauta un caracter in alfabetul 
+Base64:
+
+movzx ebx, byte [alphabet + ebx]   ; Mapeaza cei 6 biți la caracterul Base64
+mov [edi], bl                      ; Salveaza caracterul in output
+
+Stocarea caracterelor Base64
+Fiecare dintre cei 4 caractere obtinuti din cei 24 de biți este stocat in edi, adica in array-ul de 
+iesire. Dupa fiecare caracter, edi este incrementat cu 1 pentru a aloca spatiu pentru urmatorul 
+caracter.
+
+Actualizarea indicilor
+
+Dupa ce am procesat fiecare grup de 3 bytes:
+- Am incrementat ecx cu 3 pentru a trece la urmatorul grup de bytes din string-ul de intrare.
+- Am incrementat edi cu 4 pentru a trece la urmatoarea pozitie din array-ul de iesire pentru a plasa 
+urmatoarele 4 caractere Base64.
+
+Task 4 - sudoku
+
+Obiectivul principal a fost sa verificam daca fiecare linie, coloana si cutie 3x3 contin valori 
+valide (intre 1 si 9) si nu au duplicate. Pentru a face acest lucru, am folosit un array auxiliar 
+numit digit_exists pentru a urmari valorile deja intalnite intr-o linie, coloana sau cutie. Array-ul 
+are 10 elemente (de la 0 la 9), iar daca o valoare este intalnita, este marcata in acest array.
+La inceputul fiecarei functii, acest array este setat la 0. Pe masura ce intalnim o valoare validă 
+(1-9), marcam valoarea in digit_exists. Daca o valoare se repeta, functia returneaza 2 (invalid). 
+Daca totul este corect, returneaza 1 (valid).
+
+Verificarea unei linii (check_row)
+
+Scopul acestei functii este sa verifice daca toate valorile dintr-un rand respecta regulile Sudoku: 
+fiecare valoare trebuie sa fie intre 1 si 9 si nu trebuie sa existe duplicate.
+
+Calculul pozitie de start a liniei s-a realizat prin inmultirea indexului liniei cu 9, deoarece 
+fiecare linie are 9 celule. Formula folosita pentru acest calcul a fost row * 9, iar pentru aceasta 
+am folosit eax pentru a face calculul si esi pentru a muta pointerul la inceputul liniei.
+
+In functie de pozitia respectiva, iteram prin cele 9 elemente ale randului folosind ebx, care 
+controleaza bucla. Pentru fiecare celula a randului, verificam daca valoarea este intre 1 si 9 si 
+daca nu exista duplicate.
+
+Pentru a urmari valorile intalnite, am folosit un array auxiliar digit_exists, care este gestionat de 
+edi. Daca se intalnește un duplicat (adica o valoare deja existenta in digit_exists), functia 
+returneaza 2. Daca toate valorile sunt valide, functia returneaza 1.
+
+Verificarea unei coloane (check_column)
+
+La fel ca pentru randuri, pentru verificarea coloanelor am folosit un proces similar, dar in acest 
+caz, pentru fiecare celula din coloana trebuie sa calculam pozitia respectiva in tabela.
+
+In primul rand, am calculat pozitia de start a fiecarei coloane prin mutarea pointerului esi. Pentru 
+fiecare element din coloana, am adaugat offset-ul calculat ca row * 9 pentru a ajunge la fiecare 
+celula din acea coloana.
+
+Pentru a verifica valorile, am folosit digit_exists pentru a preveni duplicatele, iar pentru iterare 
+am folosit ebx. Daca gasim o valoare invalida sau un duplicat, functia returneaza 2. Daca coloana 
+este validă, functia returneaza 1.
+
+Verificarea unei cutii 3x3 (check_box)
+
+Verificarea unei cutii 3x3 este mai complexa, deoarece trebuie sa calculam corect pozitia fiecarei 
+cutii intr-o tabla 9x9. Fiecare cutie contine 9 celule si pentru a le verifica corect, am calculat 
+mai intai pozitia de start a cutiei pe baza indexului acesteia (0-8).
+
+Calculul pozitiei de start pentru o cutie implica doi pasi:
+
+Se imparte indexul cutiei la 3 (box / 3) pentru a obtine banda orizontala(de 3 linii) in care se afla 
+cutia. 
+
+Se foloseste restul impartirii (box % 3) pentru a calcula bada verticala (de 3 col) coloana in care 
+se afla cutia.
+
+Astfel, pozitia de start a cutiei este obtinuta prin formula (box / 3) * 27 + (box % 3) * 3, care 
+este aplicata pe pointerul esi pentru a muta esi la inceputul cutiei.
+
+Odata ce am stabilit pozitia de start, am folosit ebx pentru a itera prin cele 9 celule din cutie. 
+Similar cu verificarea randurilor si coloanelor, am folosit digit_exists pentru a preveni duplicatele 
+si am verificat daca fiecare valoare din cutie este valida (intre 1 si 9).
+
+Daca am gasit o valoare invalida sau un duplicat, functia returneaza 2. Daca toate valorile sunt 
+corecte, functia returneaza 1.
+
+Detalii tehnice suplimentare
+
+esi este folosit pentru a stoca pointerul catre tabla de Sudoku.
+edi este folosit pentru a accesa digit_exists, array-ul care ne ajuta sa urmarim valorile intalnite.
+ebx este utilizat pentru a controla buclele de iterare prin randuri, coloane sau cutii.
+ecx controleaza buclele de iterare si este folosit pentru a monitoriza numarul de iterații.
+
+La finalul fiecarei functii, am returnat 1 daca rândul, coloana sau cutia este validă, și 2 dacă 
+există o valoare invalidă sau duplicate.
