@@ -1,4 +1,4 @@
-# README: Mihut Maria-Emilia 311CA
+# README:
 
 ---
 
